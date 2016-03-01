@@ -32,7 +32,7 @@ namespace Genus.Migrator.Model.Builder
                 throw new InvalidOperationException("Add fields to index");
         }
 
-        internal IIndex Build(string name, Table table)
+        internal IIndex Build(string name, ITable table)
         {
             Validate();
             var index = new Index(name, table)
@@ -41,7 +41,7 @@ namespace Genus.Migrator.Model.Builder
                 Fields = _fileds.Select(f =>
                             new IndexItem
                             {
-                                Field = table.Fields.First(_ => _.ClrName == f.Key),
+                                Field = table.FindField(f.Key),
                                 Decending = f.Value
                             }).ToArray()
             };

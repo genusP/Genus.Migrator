@@ -24,7 +24,7 @@ namespace Genus.Migrator.Model.Builder
             if (_with.ContainsKey(provider))
                 _with[provider] = with;
             else
-                _bodyScripts.Add(provider, with);
+                _with.Add(provider, with);
             return this;
         }
 
