@@ -28,12 +28,5 @@ namespace Genus.Migrator.Migrations.Operations.Builders
             AnnotateByProvider(provider, "Collation", collation);
             return this;
         }
-
-        private void AnnotateByProvider(ProviderName provider, string key, string value)
-        {
-            if (provider != ProviderName.All)
-                key = provider.ToString() + ":" + key;
-            Annotation(key, value);
-        }
     }
 }

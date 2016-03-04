@@ -20,18 +20,17 @@ namespace Genus.Migrator.Migrations
                 : Enumerable.Empty<MigrationOperation>();
 
         public CreateTableBuilder<T> CreateTable<T>(
-            string name, 
-            Func<FieldsBuilder, T> fields, 
-            AddPrimaryKey pk=null, 
-            string schema=null)
+           string name,
+           Func<FieldsBuilder, T> fields,
+           Func<CreateTableBuilder<T>, OperationBuilder<AddPrimaryKey>> pk = null,
+           string schema = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Need value", nameof(name));
             if (fields == null)
                 throw new ArgumentNullException(nameof(fields));
 
-            var builder = new FieldsBuilder();
-            var fieldsObj = fields(builder);
+            var fieldsObj = fields(new FieldsBuilder());
             var operation = new CreateTable
             {
                 Schema = schema,
@@ -42,12 +41,13 @@ namespace Genus.Migrator.Migrations
                                 var op = (OperationBuilder<AddField>)p.GetValue(fieldsObj);
                                 op.Operation.Name = p.Name;
                                 return op.Operation;
-                            }),
-                PrimaryKey = pk
+                            })
 
             };
+            var builder = new CreateTableBuilder<T>(operation);
+            operation.PrimaryKey = pk?.Invoke(builder)?.Operation;
             _operations.Value.Add(operation);
-            return new CreateTableBuilder<T>(operation);
+            return builder;
         }
 
         public OperationBuilder<DropTable> DropTable(string name, string schema = null)
@@ -288,6 +288,110 @@ namespace Genus.Migrator.Migrations
             };
             _operations.Value.Add(operation);
             return new OperationBuilder<RenameIndex>(operation);
+        }
+
+        public CreateViewBuilder CreateView(string name, string schema = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Need value", nameof(name));
+
+            var operation = new CreateView {
+                ViewName=name,
+                Schema=schema
+            };
+            _operations.Value.Add(operation);
+            return new CreateViewBuilder(operation);
+        }
+
+        public OperationBuilder<DropView> DropView(string name, string schema = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Need value", nameof(name));
+
+            var operation = new DropView{
+                Schema =schema,
+                ViewName = name
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<DropView>(operation);
+        }
+
+        public OperationBuilder<RenameView> RenameView(string name, string newName)
+            => RenameView(name, newName, null, null);
+
+        public OperationBuilder<RenameView> RenameView(string name, string newName, string schema, string newSchema)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Need value", nameof(name));
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new ArgumentException("Need value", nameof(newName));
+            bool isSchema = string.IsNullOrWhiteSpace(schema),
+                  isNewSchema = string.IsNullOrWhiteSpace(newSchema);
+            if (!isNewSchema && isSchema)
+                throw new ArgumentException("Need value", nameof(schema));
+            if (isNewSchema && !isSchema)
+                throw new ArgumentException("Need value", nameof(newSchema));
+
+            var operation = new RenameView {
+                Schema = schema,
+                ViewName = name,
+                NewSchema = newSchema,
+                NewViewName = newName
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<RenameView>(operation);
+        }
+
+        public CreateFunctionBuilder CreateFunction(string name, string schema = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Need value", nameof(name));
+
+            var operation = new CreateFunction {
+                FunctionName = name,
+                Schema = schema
+            };
+            _operations.Value.Add(operation);
+            return new CreateFunctionBuilder(operation);
+        }
+
+        public OperationBuilder<DropFunction> DropFunction(string name, string schema = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Need value", nameof(name));
+
+            var operation = new DropFunction {
+                Schema = schema,
+                FunctionName = name
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<DropFunction>(operation);
+        }
+
+        public OperationBuilder<RenameFunction> RenameFunction(string name, string newName)
+            => RenameFunction(name, newName, null, null);
+
+        public OperationBuilder<RenameFunction> RenameFunction(string name, string newName, string schema, string newSchema)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Need value", nameof(name));
+            if (string.IsNullOrWhiteSpace(newName))
+                throw new ArgumentException("Need value", nameof(newName));
+            bool isSchema = string.IsNullOrWhiteSpace(schema),
+                 isNewSchema = string.IsNullOrWhiteSpace(newSchema);
+            if (!isNewSchema && isSchema)
+                throw new ArgumentException("Need value", nameof(schema));
+            if (isNewSchema && !isSchema)
+                throw new ArgumentException("Need value", nameof(newSchema));
+
+            var operation = new RenameFunction {
+                FunctionName = name,
+                Schema = schema,
+                NewFunctionName = newName,
+                NewSchema = newSchema
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<RenameFunction>(operation);
         }
     }
 }

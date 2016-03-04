@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Genus.Migrator.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace Genus.Migrator.Migrations.Operations.Builders
             Operation = operation;
         }
 
-        public TOperation Operation { get; }
+        public virtual TOperation Operation { get; }
 
         public OperationBuilder<TOperation> Annotation(string key, string value)
         {
@@ -27,6 +28,13 @@ namespace Genus.Migrator.Migrations.Operations.Builders
             else
                 Operation.Annotations.Add(key, value);
             return this;
+        }
+
+        protected void AnnotateByProvider(ProviderName provider, string key, string value)
+        {
+            if (provider != ProviderName.All)
+                key = provider.ToString() + ":" + key;
+            Annotation(key, value);
         }
     }
 }

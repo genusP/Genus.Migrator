@@ -91,6 +91,33 @@ namespace Genus.Migrator.Tests.Migrations
             Assert.Throws<ArgumentException>("newName", () => migrationBuilder.RenameIndex("name", " ", "table"));
             Assert.Throws<ArgumentException>("table", () => migrationBuilder.RenameIndex("name", "newname", null));
             Assert.Throws<ArgumentException>("table", () => migrationBuilder.RenameIndex("name", "newname", " "));
+
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.CreateView(null));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.CreateView(" "));
+
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.CreateFunction(null));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.CreateFunction(" "));
+
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.DropView(null));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.DropView(" "));
+
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.DropFunction(null));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.DropFunction(" "));
+
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.RenameFunction(null, "newname"));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.RenameFunction(" ", "newname"));
+            Assert.Throws<ArgumentException>("newName", () => migrationBuilder.RenameFunction("name", null));
+            Assert.Throws<ArgumentException>("newName", () => migrationBuilder.RenameFunction("name", " "));
+            Assert.Throws<ArgumentException>("newSchema", () => migrationBuilder.RenameFunction("name", "newname", "schema", null));
+            Assert.Throws<ArgumentException>("schema", () => migrationBuilder.RenameFunction("name", "newname", null, "newSchema"));
+
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.RenameView(null, "newname"));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.RenameView(" ", "newname"));
+            Assert.Throws<ArgumentException>("newName", () => migrationBuilder.RenameView("name", null));
+            Assert.Throws<ArgumentException>("newName", () => migrationBuilder.RenameView("name", " "));
+            Assert.Throws<ArgumentException>("newSchema", () => migrationBuilder.RenameView("name", "newname", "schema", null));
+            Assert.Throws<ArgumentException>("schema", () => migrationBuilder.RenameView("name", "newname", null, "newSchema"));
+
         }
 
         [Fact]
@@ -105,7 +132,7 @@ namespace Genus.Migrator.Tests.Migrations
                 name: "test_table",
                 fields: table => new{
                     Id = new FieldBuilder(field)},
-                pk: pk
+                pk: t=>new OperationBuilder<AddPrimaryKey>(pk)
                 );
 
             Assert.NotNull(res);
@@ -348,6 +375,96 @@ namespace Genus.Migrator.Tests.Migrations
             Assert.NotNull(res.Operation);
             Assert.Empty(res.Operation.Annotations);
             Assert.Equal("Select 1 a", res.Operation.Sql);
+            Assert.Contains(res.Operation, migrationBuilder.Operations);
+        }
+
+        [Fact]
+        public void create_view()
+        {
+            var migrationBuilder = new MigrationBuilder();
+
+            var res = migrationBuilder.CreateView(name: "name", schema: "dbo");
+
+            Assert.NotNull(res);
+            Assert.NotNull(res.Operation);
+            Assert.Equal("name", res.Operation.ViewName);
+            Assert.Equal("dbo", res.Operation.Schema);
+            Assert.Contains(res.Operation, migrationBuilder.Operations);
+        }
+
+        [Fact]
+        public void drop_view()
+        {
+            var migrationBuilder = new MigrationBuilder();
+
+            var res = migrationBuilder.DropView(name: "name", schema: "dbo");
+
+            Assert.NotNull(res);
+            Assert.NotNull(res.Operation);
+            Assert.Equal("name", res.Operation.ViewName);
+            Assert.Equal("dbo", res.Operation.Schema);
+            Assert.Contains(res.Operation, migrationBuilder.Operations);
+        }
+
+        [Fact]
+        public void rename_view()
+        {
+            var migrationBuilder = new MigrationBuilder();
+
+            var res = migrationBuilder.RenameView(name: "old_name", newName: "new_name", schema: "dbo", newSchema: "ndbo");
+
+            Assert.NotNull(res);
+            Assert.NotNull(res.Operation);
+            Assert.Empty(res.Operation.Annotations);
+            Assert.Equal("old_name", res.Operation.ViewName);
+            Assert.Equal("dbo", res.Operation.Schema);
+            Assert.Equal("new_name", res.Operation.NewViewName);
+            Assert.Equal("ndbo", res.Operation.NewSchema);
+            Assert.Contains(res.Operation, migrationBuilder.Operations);
+        }
+
+        [Fact]
+        public void create_function()
+        {
+            var migrationBuilder = new MigrationBuilder();
+
+            var res = migrationBuilder.CreateFunction(name: "name", schema: "dbo");
+
+            Assert.NotNull(res);
+            Assert.NotNull(res.Operation);
+            Assert.Equal("name", res.Operation.FunctionName);
+            Assert.Equal("dbo", res.Operation.Schema);
+            Assert.Contains(res.Operation, migrationBuilder.Operations);
+        }
+
+        [Fact]
+        public void drop_function()
+        {
+            var migrationBuilder = new MigrationBuilder();
+
+            var res = migrationBuilder.DropFunction(name: "name", schema: "dbo");
+
+            Assert.NotNull(res);
+            Assert.NotNull(res.Operation);
+            Assert.Equal("name", res.Operation.FunctionName);
+            Assert.Equal("dbo", res.Operation.Schema);
+            Assert.Contains(res.Operation, migrationBuilder.Operations);
+        }
+
+        [Fact]
+        public void rename_function()
+        {
+            var migrationBuilder = new MigrationBuilder();
+
+            var res = migrationBuilder.RenameFunction(name: "old_name", newName: "new_name", schema: "dbo", newSchema: "ndbo");
+
+            Assert.NotNull(res);
+            Assert.NotNull(res.Operation);
+            Assert.Empty(res.Operation.Annotations);
+            Assert.Equal("old_name", res.Operation.FunctionName);
+            Assert.Equal("dbo", res.Operation.Schema);
+            Assert.Equal("new_name", res.Operation.NewFunctionName);
+            Assert.Equal("ndbo", res.Operation.NewSchema);
             Assert.Contains(res.Operation, migrationBuilder.Operations);
         }
     }
