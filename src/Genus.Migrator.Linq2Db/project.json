@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0-alpha2-1000",
+  "description": "Genus.Migrator.Linq2Db Class Library",
+  "authors": [ "genusP" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "frameworks": {
+    "net451": { }
+  },
+  "dependencies": {
+    "Genus.Migrator": "1.0.0-alpha2-1000",
+    "linq2db": "1.0.7.3"
+  }
+}

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -59,7 +60,7 @@ namespace Genus.Migrator.Model.Builder
             return null;
         }
 
-        public FieldBuilder Field(string name)
+        public FieldBuilder Field(string name, DbType? dbType=null, int? length=null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is empty");
@@ -69,6 +70,8 @@ namespace Genus.Migrator.Model.Builder
                 builder = new FieldBuilder(this);
                 _fields.Value.Add(name, builder);
             }
+            if (dbType.HasValue)
+                builder.HasType(dbType.Value, length ?? -1);
             return builder;
         }
 
@@ -100,7 +103,7 @@ namespace Genus.Migrator.Model.Builder
             }
         }
 
-        public AssociationBuilder Association(string foreignKey, string principalTable, string principalKey=null)
+        public AssociationBuilder Association(string foreignKey, string principalTable, string principalKey)
             =>AssociationImplement(foreignKey, principalTable, principalKey, ()=>new AssociationBuilder());
 
         protected AssociationBuilder AssociationImplement(

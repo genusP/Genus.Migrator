@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Migrations.Operations
 {
-    public class MigrationOperation
+    public abstract class MigrationOperation
     {
         public Dictionary<string, string> Annotations { get; } = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        public abstract int OrderHint { get; }
     }
 }

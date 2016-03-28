@@ -10,5 +10,8 @@ namespace Genus.Migrator.Migrations.Operations
         public IEnumerable<string> Fields { get; set; }
         public string IndexName { get; set; }
         public bool IsUnique { get; set; }
+
+        public override int OrderHint
+            => 8000;
     }
 }

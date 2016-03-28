@@ -11,5 +11,8 @@ namespace Genus.Migrator.Migrations.Operations
         public string NewFunctionName { get; internal set; }
         public string NewSchema { get; internal set; }
         public string Schema { get; internal set; }
+
+        public override int OrderHint
+            => 8000;
     }
 }

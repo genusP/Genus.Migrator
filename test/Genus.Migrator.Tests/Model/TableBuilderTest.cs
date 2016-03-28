@@ -22,7 +22,6 @@ namespace Genus.Migrator.Tests.Model
         {
             yield return new Func<TableBuilder, object>[] { tb => tb.Field("testField") };
             yield return new Func<TableBuilder, object>[] { tb => tb.Index("testIndex") };
-            yield return new Func<TableBuilder, object>[] { tb => tb.Association("testA", "iiii") };
             yield return new Func<TableBuilder, object>[] { tb => tb.Association("testA2", "asas", "pppp") };
         }
 
@@ -81,7 +80,7 @@ namespace Genus.Migrator.Tests.Model
 
             target.Index("asd").OnColumn(fields.Last());
 
-            target.Association("aassds", "iiiii");
+            target.Association("aassds", "iiiii", "id");
 
             if(with!=null)
                 foreach (var item in with)

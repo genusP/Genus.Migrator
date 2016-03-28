@@ -10,9 +10,12 @@ namespace Genus.Migrator.Model.Builder
 {
     public class TableBuilder<T>:TableBuilder
     {
-        public FieldBuilder Field<TRet>(Expression<Func<T, TRet>> fieldExp)
+        public FieldBuilder Field<TRet>(Expression<Func<T, TRet>> fieldExp, int length=-1)
         {
-            return Field(ExpressionHelper.GetPropertyName(fieldExp));
+            var res = Field(ExpressionHelper.GetPropertyName(fieldExp));
+            if(ClrTypeConverter.IsConvertable(typeof(TRet)))
+                res.HasType(ClrTypeConverter.ConvertClrTypeToDbType(typeof(TRet)), length);
+            return res;
         }
 
         public new IndexBuilder<T> Index(string name)
@@ -31,7 +34,7 @@ namespace Genus.Migrator.Model.Builder
 
         public AssociationBuilder<T, TPricipal> Association<TPricipal>(
             Expression<Func<T,object>> foreignKey, 
-            Expression<Func<TPricipal, object>> principalKey =null)
+            Expression<Func<TPricipal, object>> principalKey)
         {
             var strForeignKey = ExpressionHelper.GetPropertyName(foreignKey);
             var strPrincipalTable = typeof(TPricipal).FullName;

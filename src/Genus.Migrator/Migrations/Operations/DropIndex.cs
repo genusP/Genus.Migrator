@@ -8,5 +8,8 @@ namespace Genus.Migrator.Migrations.Operations
     public sealed class DropIndex:TableOperation
     {
         public string IndexName { get; set; }
+
+        public override int OrderHint
+            => 1000;
     }
 }

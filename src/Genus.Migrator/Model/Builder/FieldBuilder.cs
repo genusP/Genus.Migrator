@@ -48,12 +48,14 @@ namespace Genus.Migrator.Model.Builder
         public FieldBuilder AsIdentity()
         {
             IsIdentity = true;
+            IsNullable = false;
             return this;
         }
 
         public FieldBuilder AsNullable()
         {
             IsNullable = true;
+            IsIdentity = false;
             return this;
         }
 

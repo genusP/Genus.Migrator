@@ -8,5 +8,8 @@ namespace Genus.Migrator.Migrations.Operations
     public sealed class DropForeignKey:TableOperation
     {
         public string ForeignKeyName { get; set; }
+
+        public override int OrderHint
+            => 1000;
     }
 }

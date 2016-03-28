@@ -9,5 +9,8 @@ namespace Genus.Migrator.Migrations.Operations
     {
         public string FieldName { get; set; }
         public string NewFieldName { get; set; }
+
+        public override int OrderHint
+            => 8000;
     }
 }

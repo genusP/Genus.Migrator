@@ -9,5 +9,8 @@ namespace Genus.Migrator.Migrations.Operations
     {
         public string IndexName { get; set; }
         public string NewIndexName { get; set; }
+
+        public override int OrderHint
+            => 8000;
     }
 }

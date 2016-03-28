@@ -7,6 +7,7 @@ using System.Data;
 
 namespace Genus.Migrator.Model.Internal
 {
+    [System.Diagnostics.DebuggerDisplay("DbName = {DbName}")]
     internal class Field : IField
     {
         public Field(

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Model.Internal
 {
+    [System.Diagnostics.DebuggerDisplay("Schema = {Schema}, DbName = {DbName}")]
     internal class View : IView
     {
         public View(string name, IModel model)

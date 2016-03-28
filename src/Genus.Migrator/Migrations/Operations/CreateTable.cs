@@ -10,5 +10,8 @@ namespace Genus.Migrator.Migrations.Operations
     {
         public IEnumerable<AddField> Fields { get; set; }
         public AddPrimaryKey PrimaryKey { get; set; }
+
+        public override int OrderHint
+            => 6000;
     }
 }

@@ -11,6 +11,8 @@ namespace Genus.Migrator.Model.Builder
         Dictionary<string, bool> _fileds = new Dictionary<string, bool>();
         public IndexBuilder OnColumn(string field, bool descending = false)
         {
+            if (string.IsNullOrEmpty(field))
+                throw new ArgumentException("Need value", nameof(field));
             if (_fileds.ContainsKey(field))
                 _fileds[field] = descending;
             else

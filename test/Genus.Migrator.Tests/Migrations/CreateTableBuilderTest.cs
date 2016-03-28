@@ -21,7 +21,7 @@ namespace Genus.Migrator.Tests.Migrations
         public void primarykey_required_argument()
         {
             var creatateTableOperation = new CreateTable();
-            var target = new CreateTableBuilder<entity>(creatateTableOperation);
+            var target = new CreateTableBuilder(creatateTableOperation);
 
             Assert.Throws<ArgumentException>("name", () => target.PrimaryKey(null));
             Assert.Throws<ArgumentException>("name", () => target.PrimaryKey(" "));
@@ -32,9 +32,9 @@ namespace Genus.Migrator.Tests.Migrations
         public void primarykey()
         {
             var creatateTableOperation = new CreateTable();
-            var target = new CreateTableBuilder<entity>(creatateTableOperation);
+            var target = new CreateTableBuilder(creatateTableOperation);
 
-            var res = target.PrimaryKey("PK_test", e => e.id);
+            var res = target.PrimaryKey("PK_test", "id");
 
             Assert.NotNull(res);
             Assert.NotNull(res.Operation);

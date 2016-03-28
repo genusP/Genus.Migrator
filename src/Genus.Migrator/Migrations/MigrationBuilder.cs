@@ -3,6 +3,7 @@ using Genus.Migrator.Migrations.Operations.Builders;
 using Genus.Migrator.Model;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -19,32 +20,27 @@ namespace Genus.Migrator.Migrations
                 ? _operations.Value
                 : Enumerable.Empty<MigrationOperation>();
 
-        public CreateTableBuilder<T> CreateTable<T>(
-           string name,
-           Func<FieldsBuilder, T> fields,
-           Func<CreateTableBuilder<T>, OperationBuilder<AddPrimaryKey>> pk = null,
-           string schema = null)
+        public CreateTableBuilder CreateTable(
+            string name, 
+            Action<FieldsBuilder> fields, 
+            Func<CreateTableBuilder,OperationBuilder<AddPrimaryKey>> pk=null, 
+            string schema=null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Need value", nameof(name));
             if (fields == null)
                 throw new ArgumentNullException(nameof(fields));
 
-            var fieldsObj = fields(new FieldsBuilder());
+            IList<FieldBuilder> fieldBuilders = new List<FieldBuilder>();
+            fields(new FieldsBuilder(fieldBuilders));
             var operation = new CreateTable
             {
                 Schema = schema,
                 TableName = name,
-                Fields = fieldsObj.GetType().GetProperties()
-                            .Select(p =>
-                            {
-                                var op = (OperationBuilder<AddField>)p.GetValue(fieldsObj);
-                                op.Operation.Name = p.Name;
-                                return op.Operation;
-                            })
+                Fields = fieldBuilders.Select(_=>_.Operation).ToArray()
 
             };
-            var builder = new CreateTableBuilder<T>(operation);
+            var builder = new CreateTableBuilder(operation);
             operation.PrimaryKey = pk?.Invoke(builder)?.Operation;
             _operations.Value.Add(operation);
             return builder;
@@ -64,7 +60,7 @@ namespace Genus.Migrator.Migrations
         }
 
         public OperationBuilder<CreateIndex> CreateIndex(string name, string table, string[] fields, bool unique =false, string tableSchema=null)
-        {
+        {//TODO: Необходимы изменения для поддержки учета направления сортировки столбцов
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Need value", nameof(name));
             if (string.IsNullOrWhiteSpace(table))
@@ -81,6 +77,38 @@ namespace Genus.Migrator.Migrations
             };
             _operations.Value.Add(operation);
             return new OperationBuilder<CreateIndex>(operation);
+        }
+
+        public FieldBuilder AddField(string table, string name, DbType dbType, int? length = null, bool nullable = true, bool identity = false, string schema=null)
+        {
+            var operation = new AddField
+            {
+                TableName = table,
+                Name = name,
+                Type = dbType,
+                Length = length,
+                IsNullable = nullable,
+                IsIdentity = identity,
+                Schema = schema
+            };
+            _operations.Value.Add(operation);
+            return  new FieldBuilder(operation);
+        }
+
+        public OperationBuilder<AlterField> AlterField(string table, string name, DbType? dbType=null, int? length = null, bool nullable = true, bool identity = false, string schema = null)
+        {
+            var operation = new AlterField
+            {
+                TableName = table,
+                Name = name,
+                Type = dbType,
+                Length = length,
+                IsNullable = nullable,
+                IsIdentity = identity,
+                Schema = schema
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<AlterField>(operation);
         }
 
         public OperationBuilder<AddForeignKey> AddForeignKey(
@@ -122,13 +150,33 @@ namespace Genus.Migrator.Migrations
             return new OperationBuilder<AddForeignKey>(operation);
         }
 
-        public OperationBuilder<ExecuteSql> Sql(string sql)
+        public OperationBuilder<AddPrimaryKey> AddPrimaryKey(string name, string table, string[] fields, string schema = null)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException(nameof(name));
+            if (fields == null || fields.Length == 0)
+                throw new ArgumentException("Need fields", nameof(fields));
+            if (string.IsNullOrWhiteSpace(table))
+                throw new ArgumentException("Need table", nameof(table));
+            var operation = new AddPrimaryKey
+            {
+                PKName = name,
+                Fields = fields,
+                TableName = table,
+                Schema = schema
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<AddPrimaryKey>(operation);
+        }
+
+        public OperationBuilder<ExecuteSql> Sql(string sql, ProviderName provider)
         {
             if (string.IsNullOrWhiteSpace(sql))
                 throw new ArgumentException("Need value", nameof(sql));
             var operation = new ExecuteSql
             {
-                Sql= sql
+                Sql = sql,
+                Provider = provider
             };
             _operations.Value.Add(operation);
             return new OperationBuilder<ExecuteSql>(operation);
@@ -290,7 +338,7 @@ namespace Genus.Migrator.Migrations
             return new OperationBuilder<RenameIndex>(operation);
         }
 
-        public CreateViewBuilder CreateView(string name, string schema = null)
+        public ViewBuilder CreateView(string name, string schema = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Need value", nameof(name));
@@ -300,7 +348,7 @@ namespace Genus.Migrator.Migrations
                 Schema=schema
             };
             _operations.Value.Add(operation);
-            return new CreateViewBuilder(operation);
+            return new ViewBuilder(operation);
         }
 
         public OperationBuilder<DropView> DropView(string name, string schema = null)

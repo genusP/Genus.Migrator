@@ -9,5 +9,8 @@ namespace Genus.Migrator.Migrations.Operations
     {
         public string NewTableName { get; set; }
         public string NewSchema { get; set; }
+
+        public override int OrderHint
+            => 8000;
     }
 }

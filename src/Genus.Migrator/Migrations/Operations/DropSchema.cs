@@ -8,5 +8,8 @@ namespace Genus.Migrator.Migrations.Operations
     public class DropSchema:MigrationOperation
     {
         public string Schema { get; set; }
+
+        public override int OrderHint
+            => 4000;
     }
 }

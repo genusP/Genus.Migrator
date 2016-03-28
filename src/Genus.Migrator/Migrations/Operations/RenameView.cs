@@ -11,5 +11,8 @@ namespace Genus.Migrator.Migrations.Operations
         public string NewViewName { get; internal set; }
         public string Schema { get; internal set; }
         public string ViewName { get; set; }
+
+        public override int OrderHint
+            => 8000;
     }
 }

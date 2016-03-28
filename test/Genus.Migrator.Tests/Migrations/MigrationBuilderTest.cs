@@ -35,9 +35,9 @@ namespace Genus.Migrator.Tests.Migrations
             Assert.Throws<ArgumentException>("table", ()=> migrationBuilder.CreateIndex("name", " ", new []{ "fields" }));
             Assert.Throws<ArgumentException>("fields", ()=> migrationBuilder.CreateIndex("name", "table", null));
             Assert.Throws<ArgumentException>("fields", ()=> migrationBuilder.CreateIndex("name", "table", new string[0]));
-            Assert.Throws<ArgumentException>("name", ()=> migrationBuilder.CreateTable<object>(null, o=>o));
-            Assert.Throws<ArgumentException>("name", () => migrationBuilder.CreateTable<object>(" ", o=>o));
-            Assert.Throws<ArgumentNullException>("fields", () => migrationBuilder.CreateTable<object>("name",null));
+            Assert.Throws<ArgumentException>("name", ()=> migrationBuilder.CreateTable(null, o=> { }));
+            Assert.Throws<ArgumentException>("name", () => migrationBuilder.CreateTable(" ", o=> { }));
+            Assert.Throws<ArgumentNullException>("fields", () => migrationBuilder.CreateTable("name",null));
 
             Assert.Throws<ArgumentException>("field", () => migrationBuilder.DropField(null, "table"));
             Assert.Throws<ArgumentException>("field", () => migrationBuilder.DropField(" ", "table"));
@@ -68,8 +68,8 @@ namespace Genus.Migrator.Tests.Migrations
             Assert.Throws<ArgumentException>("schema", () => migrationBuilder.EnsureSchema(null));
             Assert.Throws<ArgumentException>("schema", () => migrationBuilder.EnsureSchema(" "));
 
-            Assert.Throws<ArgumentException>("sql", () => migrationBuilder.Sql(null));
-            Assert.Throws<ArgumentException>("sql", () => migrationBuilder.Sql(" "));
+            Assert.Throws<ArgumentException>("sql", () => migrationBuilder.Sql(null, ProviderName.All));
+            Assert.Throws<ArgumentException>("sql", () => migrationBuilder.Sql(" ", ProviderName.All));
 
             Assert.Throws<ArgumentException>("name", () => migrationBuilder.RenameTable(null, "newname"));
             Assert.Throws<ArgumentException>("name", () => migrationBuilder.RenameTable(" ", "newname"));
@@ -130,8 +130,9 @@ namespace Genus.Migrator.Tests.Migrations
             var res = migrationBuilder.CreateTable(
                 schema:"dbo",
                 name: "test_table",
-                fields: table => new{
-                    Id = new FieldBuilder(field)},
+                fields: table => {
+                    table.Field("Id", DbType.Int32);
+                },
                 pk: t=>new OperationBuilder<AddPrimaryKey>(pk)
                 );
 
@@ -140,7 +141,7 @@ namespace Genus.Migrator.Tests.Migrations
             Assert.Equal("dbo", res.Operation.Schema);
             Assert.Equal("test_table", res.Operation.TableName);
             Assert.Equal(1, res.Operation.Fields.Count());
-            Assert.Equal(field, res.Operation.Fields.First());
+            Assert.Equal("Id", res.Operation.Fields.First().Name);
             Assert.Equal(pk, res.Operation.PrimaryKey);
             Assert.Empty(res.Operation.Annotations);
             Assert.Contains(res.Operation, migrationBuilder.Operations);
@@ -369,12 +370,13 @@ namespace Genus.Migrator.Tests.Migrations
         {
             var migrationBuilder = new MigrationBuilder();
 
-            var res = migrationBuilder.Sql("Select 1 a");
+            var res = migrationBuilder.Sql("Select 1 a", ProviderName.All);
 
             Assert.NotNull(res);
             Assert.NotNull(res.Operation);
             Assert.Empty(res.Operation.Annotations);
             Assert.Equal("Select 1 a", res.Operation.Sql);
+            Assert.Equal(ProviderName.All, res.Operation.Provider);
             Assert.Contains(res.Operation, migrationBuilder.Operations);
         }
 

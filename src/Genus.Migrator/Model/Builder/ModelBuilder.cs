@@ -1,5 +1,4 @@
-﻿using Genus.Migrator.Model.Conventions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,50 +18,44 @@ namespace Genus.Migrator.Model.Builder
         private readonly Lazy<SortedDictionary<string, FunctionBuilder>> _functions
             = new Lazy<SortedDictionary<string, FunctionBuilder>>();
 
-        internal readonly object[] Conventions;
-
-        public ModelBuilder():this(null)
+        public ModelBuilder()
         {
         }
 
-        public ModelBuilder(object[] conventions)
-        {
-            Conventions = conventions ?? new object[0];
-        }
-
-        public TableBuilder Table(string name)
+        public TableBuilder Table(string name, Action<TableBuilder> setupAction = null)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is empty", nameof(name));
 
-            return AddBuilder(name, _tables, ()=>new TableBuilder(), _views, "view");
+            var builder = AddBuilder(name, _tables, ()=>new TableBuilder(), _views, "view");
+            if (setupAction != null)
+                setupAction(builder);
+            return builder;
         }
 
-        public TableBuilder Table(Type type)
+        public TableBuilder Table(Type type, Action<TableBuilder> setupAction = null)
         {
             return (TableBuilder)
                 tableGenericMethod
                     .MakeGenericMethod(type)
-                    .Invoke(this, new object[0]);
+                    .Invoke(this, new object[] { setupAction});
         }
 
-        public TableBuilder<TEntity> Table<TEntity>()
+        public TableBuilder<TEntity> Table<TEntity>(Action<TableBuilder<TEntity>> setupAction = null)
         {
             var name = typeof(TEntity).FullName;
-            Lazy<TableBuilder<TEntity>> newBuilder = new Lazy<TableBuilder<TEntity>>();
             var builder = AddBuilder(
                 name, 
                 _tables, 
-                ()=> newBuilder.Value, 
+                ()=> new TableBuilder<TEntity>(), 
                 _views, 
                 "view"
                 ) as TableBuilder<TEntity> ;
             if (builder == null)
                 throw new InvalidOperationException("Table builder not typed");
 
-            if(newBuilder.IsValueCreated)
-                foreach (var c in Conventions.OfType<ITableConvention>())
-                    c.Apply<TEntity>(newBuilder.Value, this);
+            if (setupAction!=null)
+                setupAction(builder);
 
             return builder;
         }

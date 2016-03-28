@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Model.Internal
 {
+    [System.Diagnostics.DebuggerDisplay("DbName = {DbName}")]
     internal class Index : IIndex
     {
         public Index(string name, ITable table)

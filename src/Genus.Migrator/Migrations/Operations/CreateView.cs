@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Migrations.Operations
 {
-    public class CreateView:MigrationOperation
+    public class CreateView:ViewOperation
     {
-        public string Schema { get; set; }
-        public string ViewName { get; set; }
+        public override int OrderHint
+            => 9000;
     }
 }

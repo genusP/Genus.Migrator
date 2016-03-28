@@ -1,11 +1,15 @@
 {
-  "version": "1.0.0-alpha1",
+  "version": "1.0.0-alpha2-1000",
   "description": "Migration library for .NET and .NET Core",
   "authors": [ "genusP" ],
   "tags": [ "" ],
   "repository": { "url": "https://github.com/genusP/Genus.Migrator.git" },
   "projectUrl": "",
   "licenseUrl": "",
+  "dependencies": {
+    "Microsoft.Extensions.DependencyInjection": "1.0.0-rc2-16016",
+    "Microsoft.Extensions.Options": "1.0.0-rc2-15942"
+  },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
@@ -16,6 +20,7 @@
     "dotnet5.4": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.IO.FileSystem": "4.0.1-beta-23516",
         "System.Collections": "4.0.11-beta-23516",
         "System.Linq": "4.0.1-beta-23516",
         "System.Runtime": "4.0.21-beta-23516",

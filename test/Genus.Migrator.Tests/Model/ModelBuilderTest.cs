@@ -1,6 +1,5 @@
 ﻿using Genus.Migrator.Model;
 using Genus.Migrator.Model.Builder;
-using Genus.Migrator.Model.Conventions;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -52,7 +51,7 @@ namespace Genus.Migrator.Tests.Model
         public void build_model()
         {
             var target = new ModelBuilder();
-            target.Table("table").Field("tf").HasType(DbType.AnsiString, 3);
+            target.Table("table").Field("tf", DbType.AnsiString, 3);
             target.View("view").SetBodyScript( ProviderName.All, "SELECT 1 a");
             target.Function("func").SetScript(ProviderName.All, "CREATE Function a() as Select 1 a");
 
@@ -75,9 +74,9 @@ namespace Genus.Migrator.Tests.Model
         {
             var target = new ModelBuilder();
             target.Table("table1")
-                .Fields(tb => tb.Field("id").HasType(DbType.Int32));
+                .Fields(tb => tb.Field("id", DbType.Int32));
             target.Table("table2")
-                .Fields(tb => tb.Field("fkid").HasType(DbType.Int32))
+                .Fields(tb => tb.Field("fkid", DbType.Int32))
                 .Association("fkid", "table1", "id");
 
             var res = target.Build();
@@ -86,28 +85,6 @@ namespace Genus.Migrator.Tests.Model
             var t2 = res.FindTable("table2");
             Assert.NotNull(t2);
             Assert.Equal(1, t2.Associations.Count());
-        }
-
-        class TestConvention : ITableConvention
-        {
-            public bool Applyed { get; private set; }
-
-            public void Apply<TEntity>(TableBuilder<TEntity> tableBuilder, ModelBuilder modelBuilder)
-            {
-                Applyed = true;
-            }
-        }
-
-        [Fact]
-        public void can_call_convention_with_add_table()
-        {
-            var convention = new TestConvention();
-            var target = new ModelBuilder(new object[] { convention });
-
-            target.Table<object>();
-
-            Assert.True(convention.Applyed);
-
         }
     }
 }

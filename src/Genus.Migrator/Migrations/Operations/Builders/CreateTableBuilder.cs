@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Migrations.Operations.Builders
 {
-    public class CreateTableBuilder<T>:OperationBuilder<CreateTable>
+    public class CreateTableBuilder:OperationBuilder<CreateTable>
     {
         public CreateTableBuilder(CreateTable operation)
             :base(operation)
         {
         }
-        public OperationBuilder<AddPrimaryKey> PrimaryKey(string name, params Expression<Func<T, object>>[] fields)
+        public OperationBuilder<AddPrimaryKey> PrimaryKey(string name, params string[] fields)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Name is empty", nameof(name));
@@ -22,7 +22,7 @@ namespace Genus.Migrator.Migrations.Operations.Builders
             var o = new AddPrimaryKey
             {
                 PKName = name,
-                Fields = fields.Select(_ => ExpressionHelper.GetPropertyName(_)).ToArray()
+                Fields = fields
             };
             return new OperationBuilder<AddPrimaryKey>(o);
         }

@@ -7,5 +7,7 @@ namespace Genus.Migrator.Migrations.Operations
 {
     public sealed class DropTable:TableOperation
     {
+        public override int OrderHint
+            => 3000;
     }
 }

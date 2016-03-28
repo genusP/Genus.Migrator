@@ -15,5 +15,8 @@ namespace Genus.Migrator.Migrations.Operations
         public string PrincipalField { get; set; }
         public ForeignKeyAction? OnDelete { get; set; }
         public ForeignKeyAction? OnUpdate { get; set; }
+
+        public override int OrderHint
+            => 12000;
     }
 }

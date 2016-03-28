@@ -9,5 +9,8 @@ namespace Genus.Migrator.Migrations.Operations
     {
         public string FunctionName { get; internal set; }
         public string Schema { get; internal set; }
+
+        public override int OrderHint
+            => 9000;
     }
 }

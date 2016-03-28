@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Model.Internal
 {
+    [System.Diagnostics.DebuggerDisplay("Schema = {Schema}, DbName = {DbName}")]
     internal class Table : ITable
     {
         public Table(string clrName, IModel model)
