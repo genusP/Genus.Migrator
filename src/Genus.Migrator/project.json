@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha2-1000",
+  "version": "1.0.0-alpha2-1501",
   "description": "Migration library for .NET and .NET Core",
   "authors": [ "genusP" ],
   "tags": [ "" ],
@@ -26,7 +26,7 @@
         "System.Runtime": "4.0.21-beta-23516",
         "System.Threading": "4.0.11-beta-23516",
         "System.Data.Common": "4.0.1-beta-23516",
-        "System.ComponentModel.Annotations": "4.0.10-beta-23019"
+        "System.ComponentModel.Annotations": "4.0.11-beta-23516"
       }
     }
   }

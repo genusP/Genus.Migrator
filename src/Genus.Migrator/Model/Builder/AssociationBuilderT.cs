@@ -30,7 +30,7 @@ namespace Genus.Migrator.Model.Builder
         {
             var foreignKey = ExpressionHelper.GetPropertyName(dependNavigation);
             string principalKey = null;
-            if (principalNavigation == null)
+            if (principalNavigation != null)
                 principalKey = ExpressionHelper.GetPropertyName(principalNavigation);
             base.WithNavigation(foreignKey, principalKey);
             return this;

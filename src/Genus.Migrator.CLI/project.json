@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha2-1000",
+  "version": "1.0.0-alpha2-1500",
   "description": "Genus.Migrator CLI",
   "authors": [ "genusP" ],
   "tags": [ "" ],
@@ -18,7 +18,7 @@
     }
   },
   "dependencies": {
-    "Genus.Migrator": "1.0.0-alpha2-1000",
+    "Genus.Migrator": "1.0.0-alpha2-1500",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final",
     "Microsoft.Extensions.CommandLineUtils": "1.0.0-rc2-16107"
   }
