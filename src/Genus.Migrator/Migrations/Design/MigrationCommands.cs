@@ -163,7 +163,7 @@ namespace Genus.Migrator.Migrations.Design
             bool isDownMigration;
             var migrations = GetMigartionsForApply(currentMigrationName, migrationName, out isDownMigration);
             var sqlGenerator = GetSqlGenerator(providerName);
-            var sqlScripts = GetSqlScriptsByMigration(sqlGenerator, isDownMigration, migrations.Reverse());
+            var sqlScripts = GetSqlScriptsByMigration(sqlGenerator, isDownMigration, migrations);
             var sb = new StringBuilder();
             foreach (var item in sqlScripts)
             {
@@ -217,7 +217,7 @@ namespace Genus.Migrator.Migrations.Design
                 || migrationName.Equals("0", StringComparison.OrdinalIgnoreCase) == true)
             {
                 down = true;
-                return applied.Reverse().TakeWhile(m => m.Key != migrationName);
+                return applied.TakeWhile(m => m.Key != migrationName);
             }
             if (notApplied.ContainsKey(migrationName)
                 || migrationName.Equals("last", StringComparison.OrdinalIgnoreCase) == true)
@@ -236,6 +236,8 @@ namespace Genus.Migrator.Migrations.Design
             var migrationLog = ServiceProvider.GetRequiredService<IMigrationLog>();
             if (!migrationLog.IsExist())
                 yield return new KeyValuePair<string, IEnumerable<string>>("Migrator log table", new[] { migrationLog.GetCreateSqlScript() });
+            if (!isDownMigration)
+                migrations = migrations.Reverse();
             foreach (var migration in migrations)
             {
                 var migrationId = migration.Key.Substring(1);

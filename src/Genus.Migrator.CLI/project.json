@@ -18,7 +18,7 @@
     }
   },
   "dependencies": {
-    "Genus.Migrator": "1.0.0-alpha2-1500",
+    "Genus.Migrator": "1.0.0-*",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-rc1-final",
     "Microsoft.Extensions.CommandLineUtils": "1.0.0-rc2-16107"
   }
