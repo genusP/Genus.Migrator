@@ -53,14 +53,11 @@ namespace Genus.Migrator.Migrations.Design.Internal
 
                 if (table.Associations.Any())
                 {
-                    using (builder.Indenter())
+                    foreach (var association in table.Associations)
                     {
-                        foreach (var association in table.Associations)
-                        {
-                            builder.AppendNewLine("tb");
-                            GenerateAssociation(association, builder);
-                            builder.Append(";");
-                        }
+                        builder.AppendNewLine("tb");
+                        GenerateAssociation(association, builder);
+                        builder.Append(";");
                     }
                 }
 
@@ -175,7 +172,7 @@ namespace Genus.Migrator.Migrations.Design.Internal
             var dependField = association.Field.ClrName;
             var principalTable = association.ReferenceField.Table.ClrName;
             var principalKey = association.ReferenceField.ClrName;
-            builder.AppendNewLine($".Association(\"{dependField}\",\"{principalTable}\",\"{principalKey}\")");
+            builder.Append($".Association(\"{dependField}\",\"{principalTable}\",\"{principalKey}\")");
             using (builder.Indenter())
             {
                 var depNavStr = string.IsNullOrWhiteSpace(association.DependentNavigation)

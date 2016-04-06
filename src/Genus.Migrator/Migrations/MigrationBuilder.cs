@@ -95,7 +95,7 @@ namespace Genus.Migrator.Migrations
             return  new FieldBuilder(operation);
         }
 
-        public OperationBuilder<AlterField> AlterField(string table, string name, DbType? dbType=null, int? length = null, bool nullable = true, bool identity = false, string schema = null)
+        public OperationBuilder<AlterField> AlterField(string table, string name, DbType? dbType=null, int? length = null, bool? nullable = null, bool? identity = null, string schema = null)
         {
             var operation = new AlterField
             {

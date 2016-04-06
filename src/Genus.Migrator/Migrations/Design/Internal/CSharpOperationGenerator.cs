@@ -321,7 +321,7 @@ namespace Genus.Migrator.Migrations.Design.Internal
                     builder.Append(",")
                         .AppendNewLine("nullable: ")
                         .Append(operation.IsNullable.ToString().ToLower());
-                if (operation.IsIdentity!=null)
+                if (operation.IsIdentity!=null) 
                     builder.Append(",")
                         .AppendNewLine("identity: ")
                         .Append(operation.IsIdentity.ToString().ToLower());
@@ -410,16 +410,19 @@ namespace Genus.Migrator.Migrations.Design.Internal
                         .Append("\",");
                 builder.AppendNewLine("table: @\"")
                     .Append(EscapeString(operation.TableName))
-                    .Append("\", DbType.")
-                    .Append(operation.Type)
-                    .Append("\"");
-                if (operation.Length.HasValue)
-                    builder.Append(", length: ")
+                    .Append("\",")
+                    .AppendNewLine("dbType: DbType.")
+                    .Append(operation.Type);
+                if (operation.Length.HasValue && operation.Length>0)
+                    builder.Append(",")
+                        .AppendNewLine("length: ")
                         .Append(operation.Length.Value);
-                builder.Append(", nullable: ")
+                builder.Append(",")
+                    .AppendNewLine("nullable: ")
                     .Append(operation.IsNullable.ToString().ToLower());
                 if (operation.IsIdentity)
-                    builder.Append(", identity: ")
+                    builder.Append(",")
+                        .AppendNewLine("identity: ")
                         .Append(operation.IsIdentity.ToString().ToLower());
                 builder.Append(")");
                 if (operation.Annotations.Any())
@@ -448,7 +451,7 @@ namespace Genus.Migrator.Migrations.Design.Internal
                     }
                 }
             }
-            builder.AppendNewLine(";");
+            builder.Append(";");
         }
 
         public void Generate(IEnumerable<MigrationOperation> operations, IndentedStringBuilder builder)
