@@ -1,14 +1,16 @@
 {
-  "version": "1.0.0-alpha2-1510",
+  "version": "1.0.0-alpha2-1600",
   "description": "Migration library for .NET and .NET Core",
   "authors": [ "genusP" ],
-  "tags": [ "" ],
-  "repository": { "url": "https://github.com/genusP/Genus.Migrator.git" },
-  "projectUrl": "",
-  "licenseUrl": "",
+  "packOptions": {
+    "tags": [ "" ],
+    "repository": { "url": "https://github.com/genusP/Genus.Migrator.git" },
+    "projectUrl": "",
+    "licenseUrl": ""
+  },
   "dependencies": {
-    "Microsoft.Extensions.DependencyInjection": "1.0.0-rc2-16016",
-    "Microsoft.Extensions.Options": "1.0.0-rc2-15942"
+    "Microsoft.Extensions.DependencyInjection": "1.0.0",
+    "Microsoft.Extensions.Options": "1.0.0"
   },
   "frameworks": {
     "net451": {
@@ -17,16 +19,18 @@
         "System.Data": "4.0.0.0"
       }
     },
-    "dotnet5.4": {
+    "netstandard1.3": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.IO.FileSystem": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Data.Common": "4.0.1-beta-23516",
-        "System.ComponentModel.Annotations": "4.0.11-beta-23516"
+        "Microsoft.CSharp": "4.0.1",
+        "System.IO.FileSystem": "4.0.1",
+        "System.Collections": "4.0.11",
+        "System.Linq": "4.1.0",
+        "System.Runtime": "4.1.0",
+        "System.Threading": "4.0.11",
+        "System.Data.Common": "4.1.0",
+        "System.ComponentModel.Annotations": "4.1.0",
+        "System.Reflection.Extensions": "4.0.1",
+        "System.Reflection.TypeExtensions": "4.1.0"
       }
     }
   }

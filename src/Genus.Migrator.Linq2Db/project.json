@@ -2,9 +2,11 @@
   "version": "1.0.0-alpha2-1500",
   "description": "Genus.Migrator.Linq2Db Class Library",
   "authors": [ "genusP" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
+  "packOptions": {
+    "tags": [ "" ],
+    "projectUrl": "",
+    "licenseUrl": ""
+  },
   "frameworks": {
     "net451": { }
   },
