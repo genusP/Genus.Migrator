@@ -59,5 +59,43 @@ namespace Genus.Migrator.Migrations.Design.Internal
             return builder.ToString();
             
         }
+
+        protected override string Generate(CreateTrigger operation)
+            => GenerateTrigger(operation, "CREATE");
+
+        protected override string Generate(AlterTrigger operation)
+            => GenerateTrigger(operation, "ALTER");
+
+        private string GenerateTrigger(CreateTrigger operation, string sqlOperation)
+        {
+            var script = GetAnotation(operation, "sql");
+            if (script == null)                
+                throw new InvalidOperationException($"Script for trigger {operation.TriggerSchema}.{operation.TriggerName} and provider '{ProviderName}' not found.");
+            builder.Clear();
+            builder.Append(sqlOperation).Append(" TRIGGER ");
+            if(!string.IsNullOrWhiteSpace(operation.TriggerSchema))
+                builder.Append(Quote(operation.TriggerSchema))
+                    .Append(".");
+            builder.Append(Quote(operation.TriggerName));
+
+            builder.AppendNewLine("ON ");
+            if (!string.IsNullOrWhiteSpace(operation.Schema))
+                builder.Append(Quote(operation.Schema))
+                    .Append(".");
+            builder.Append(Quote(operation.TableName));
+
+            builder.AppendNewLine(operation.TriggerType)
+                .Append(" ");
+
+            var operations = new[] { TriggerOperation.INSERT, TriggerOperation.UPDATE, TriggerOperation.DELETE }
+                                 .Where(to => (operation.TriggerOperation & to) == to)
+                                 .Select(to => to.ToString());
+            builder.Append(string.Join(", ", operations));
+            builder.AppendNewLine("AS");
+
+            builder.AppendNewLine(script);
+
+            return builder.ToString();
+        }
     }
 }

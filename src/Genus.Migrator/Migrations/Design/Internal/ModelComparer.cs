@@ -80,6 +80,8 @@ namespace Genus.Migrator.Migrations.Design.Internal
 
                     foreach (var operation in CompareAssociations(current.Associations, target.Associations))
                         yield return operation;
+                    foreach (var operation in CompareTriggers(current.Triggers, target.Triggers))
+                        yield return operation;
                 }
             }
         }
@@ -354,7 +356,7 @@ namespace Genus.Migrator.Migrations.Design.Internal
                         ViewName = item.Item2.DbName
                     };
                     var b = new ViewBuilder(cv);
-                    foreach (var sqlbody in item.Item1.SqlBody)
+                    foreach (var sqlbody in item.Item2.SqlBody)
                     {
                         b.SetScript(sqlbody.Key, sqlbody.Value);
                     };
@@ -412,6 +414,59 @@ namespace Genus.Migrator.Migrations.Design.Internal
             //        }
             //}
             yield break;
+        }
+
+        protected virtual IEnumerable<MigrationOperation> CompareTriggers(IEnumerable<ITrigger> triggers1, IEnumerable<ITrigger> triggers2)
+        {
+            var pairs = FullJoin(triggers1, v => v.DbName, triggers1, v => v.DbName);
+
+            foreach (var item in pairs)
+            {
+                var current = item.Item1;
+                var target = item.Item2;
+                if (item.Item2 == null)
+                    yield return new DropTrigger
+                    {
+                        TriggerSchema = current.Schema,
+                        TriggerName   = current.DbName
+                    };
+                else if (item.Item1 == null)
+                {
+                    var cv = new CreateView
+                    {
+                        Schema   = target.Schema,
+                        ViewName = target.DbName
+                    };
+                    var b = new ViewBuilder(cv);
+                    foreach (var sqlbody in target.SqlBody)
+                    {
+                        b.SetScript(sqlbody.Key, sqlbody.Value);
+                    };
+                    yield return cv;
+                }
+                else
+                {
+                    var isChangeOperations = current.Operations != target.Operations;
+                    var isChangeTriggerType = current.TriggerType != target.TriggerType;
+                    var isScriptChanged = FullJoin(current.SqlBody, _ => _.Key, target.SqlBody, _ => _.Key).Any(i => i.Item1.Value != i.Item2.Value);
+                    if(isChangeOperations|| isChangeTriggerType|| isScriptChanged)
+                    {
+                        var at = new AlterTrigger
+                        {
+                            Schema = target.Target.Schema,
+                            TableName = target.Target.DbName,
+                            TriggerSchema = target.Schema,
+                            TriggerName = target.DbName
+                        };
+                        var builder = new CreateTriggerBuilder(at);
+                        foreach (var body in target.SqlBody)
+                        {
+                            builder.SetScript(body.Key, body.Value);
+                        }
+                        yield return at;
+                    }
+                }
+            }
         }
     }
 }

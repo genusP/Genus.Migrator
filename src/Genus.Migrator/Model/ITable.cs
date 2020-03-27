@@ -9,7 +9,7 @@ namespace Genus.Migrator.Model
         IPrimaryKey PrimaryKey { get; }
         IEnumerable<IAssociation> Associations { get; }
         IEnumerable<IIndex> Indexes { get; }
-
+        IEnumerable<ITrigger> Triggers { get; }
         IField FindField(string name);
     }
 }

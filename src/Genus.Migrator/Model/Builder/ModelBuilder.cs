@@ -10,7 +10,7 @@ namespace Genus.Migrator.Model.Builder
     public class ModelBuilder
     {
         private static MethodInfo tableGenericMethod 
-            = typeof(ModelBuilder).GetMethods().Single(m => m.IsGenericMethod && m.Name == nameof(Table));
+            = typeof(ModelBuilder).GetTypeInfo().DeclaredMethods.Single(m => m.IsGenericMethod && m.Name == nameof(Table));
         private readonly Lazy<SortedDictionary<string, TableBuilder>> _tables 
             = new Lazy<SortedDictionary<string, TableBuilder>>();
         private readonly Lazy<SortedDictionary<string, ViewBuilder>> _views 

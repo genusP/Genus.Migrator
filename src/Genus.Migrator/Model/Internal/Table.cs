@@ -58,6 +58,12 @@ namespace Genus.Migrator.Model.Internal
             set;
         }
 
+        public IEnumerable<ITrigger> Triggers
+        {
+            get;
+            set;
+        }
+
         public IField FindField(string name)
         {
             return Fields.FirstOrDefault(f=>f.ClrName == name);

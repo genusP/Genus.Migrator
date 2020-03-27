@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace Genus.Migrator.Migrations.Operations
 {
-    public class CreateView:ViewOperation
+    public class AlterTrigger : CreateTrigger
     {
-        public override int OrderHint
-            => 8000;
+        public override int OrderHint => 10000;
     }
 }

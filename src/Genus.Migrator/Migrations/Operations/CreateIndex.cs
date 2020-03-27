@@ -12,6 +12,6 @@ namespace Genus.Migrator.Migrations.Operations
         public bool IsUnique { get; set; }
 
         public override int OrderHint
-            => 8000;
+            => 9000;
     }
 }

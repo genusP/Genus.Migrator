@@ -46,7 +46,10 @@ namespace Genus.Migrator.Migrations.Design
                 {typeof(RenameFunction), o=>Generate((RenameFunction)o) },
                 {typeof(RenameIndex), o=>Generate((RenameIndex)o) },
                 {typeof(RenameTable), o=>Generate((RenameTable)o) },
-                {typeof(RenameView), o=>Generate((RenameView)o) }
+                {typeof(RenameView), o=>Generate((RenameView)o) },
+                {typeof(CreateTrigger), o=>Generate((CreateTrigger)o) },
+                {typeof(AlterTrigger), o=>Generate((AlterTrigger)o) },
+                {typeof(DropTrigger), o=>Generate((DropTrigger)o) },
             };
         }
 
@@ -309,7 +312,7 @@ namespace Genus.Migrator.Migrations.Design
             builder.Clear();
             builder.Append("ALTER TABLE ");
             FullTableName(operation.Schema, operation.TableName, builder);
-            builder.Append(" DROP CONSTARINS ")
+            builder.Append(" DROP CONSTRAINT ")
                 .Append(Quote(operation.ForeignKeyName));
 
             return builder.ToString();
@@ -331,7 +334,7 @@ namespace Genus.Migrator.Migrations.Design
             builder.Clear();
             builder.Append("ALTER TABLE ");
             FullTableName(operation.Schema, operation.TableName, builder);
-            builder.Append(" DROP CONSTARINS ")
+            builder.Append(" DROP CONSTRAINT ")
                 .Append(Quote(operation.PrimaryKeyName));
 
             return builder.ToString();
@@ -383,5 +386,20 @@ namespace Genus.Migrator.Migrations.Design
         protected abstract string Generate(RenameTable operation);
 
         protected abstract string Generate(RenameView operation);
+
+        protected abstract string Generate(CreateTrigger operation);
+
+        protected abstract string Generate(AlterTrigger operation);
+
+        protected virtual string Generate(DropTrigger operation)
+        {
+            builder.Clear();
+            builder.Append("DROP TRIGGER ");
+            if (!string.IsNullOrWhiteSpace(operation.TriggerSchema))
+                builder.Append(Quote(operation.TriggerSchema))
+                    .Append(".");
+            builder.Append(Quote(operation.TriggerName));
+            return builder.ToString();
+        }
     }
 }

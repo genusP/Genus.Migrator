@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha2-1600",
+  "version": "1.0.0-alpha2-1602",
   "description": "Migration library for .NET and .NET Core",
   "authors": [ "genusP" ],
   "packOptions": {

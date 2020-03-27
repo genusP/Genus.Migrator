@@ -17,6 +17,8 @@ namespace Genus.Migrator.Model.Builder
             = new Lazy<SortedDictionary<string, IndexBuilder>>();
         private readonly Lazy<SortedDictionary<Tuple<string,string,string>, AssociationBuilder>> _associations 
             = new Lazy<SortedDictionary<Tuple<string, string, string>, AssociationBuilder>>();
+        private readonly Lazy<SortedDictionary<Tuple<string, string>, TriggerBuilder>> _triggers
+            = new Lazy<SortedDictionary<Tuple<string, string>, TriggerBuilder>>();
 
         public TableBuilder()
         {
@@ -24,8 +26,6 @@ namespace Genus.Migrator.Model.Builder
 
         protected PrimaryKeyBuilder PrimaryKey { get; set; }
 
-        protected Dictionary<ProviderName, string> WithDict { get; } = new Dictionary<ProviderName, string>();
-        
         public PrimaryKeyBuilder HasKey(params string[] fields)
         {
 
@@ -125,13 +125,16 @@ namespace Genus.Migrator.Model.Builder
             return buider;
         }
 
-        public TableBuilder With(ProviderName provider, string value)
+        public TriggerBuilder Trigger(string name, string schema = null)
         {
-            if (WithDict.ContainsKey(provider))
-                WithDict[provider] = value;
-            else
-                WithDict.Add(provider, value);
-            return this;
+            var key = new Tuple<string, string>(name, schema);
+            TriggerBuilder builder;
+            if (!_triggers.Value.TryGetValue(key, out builder))
+            {
+                builder = new TriggerBuilder();
+                _triggers.Value.Add(key, builder);
+            }
+            return builder;
         }
 
         internal ITable Build(string name, IModel model)
@@ -150,11 +153,14 @@ namespace Genus.Migrator.Model.Builder
             if(PrimaryKey!=null)
                 table.PrimaryKey = PrimaryKey.Build(table, fb => builder2field[fb]);
 
-            table.With = new ReadOnlyDictionary<ProviderName, string>(WithDict);
+            table.With = Withs;
 
             table.Indexes = _indexes.IsValueCreated
                 ? _indexes.Value.Select(_ => _.Value.Build(_.Key, table)).ToArray()
                 : Enumerable.Empty<IIndex>();
+            table.Triggers = _triggers.IsValueCreated
+                ? _triggers.Value.Select(_ => _.Value.Build(_.Key.Item2, _.Key.Item1, table)).ToArray()
+                : Enumerable.Empty<ITrigger>();
             return table;
         }
 

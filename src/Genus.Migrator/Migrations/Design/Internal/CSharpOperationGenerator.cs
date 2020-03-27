@@ -43,7 +43,9 @@ namespace Genus.Migrator.Migrations.Design.Internal
                 {typeof(RenameFunction), (o, b)=>Generate((RenameFunction)o, b) },
                 {typeof(RenameIndex), (o, b)=>Generate((RenameIndex)o, b) },
                 {typeof(RenameTable), (o, b)=>Generate((RenameTable)o, b) },
-                {typeof(RenameView), (o, b)=>Generate((RenameView)o, b) }
+                {typeof(RenameView), (o, b)=>Generate((RenameView)o, b) },
+                {typeof(CreateTrigger), (o, b)=>Generate((CreateTrigger)o, b) },
+                {typeof(DropTrigger), (o, b)=>Generate((DropTrigger)o, b) },
             };
         }
 
@@ -272,25 +274,29 @@ namespace Genus.Migrator.Migrations.Design.Internal
             Generate(builder, operation, null, true, o => o.FunctionName, o => o.Schema);
             using (builder.Indenter())
             {
-                foreach (var item in operation.Annotations)
-                {
-                    var keyParts = item.Key.Split(':');
-                    ProviderName provider = ProviderName.All;
-                    if (keyParts.Length == 2)
-                        Enum.TryParse(keyParts[0], true, out provider);
-                    string funcName;
-                    if (string.Equals(keyParts.Last(), "sql", StringComparison.OrdinalIgnoreCase))
-                        funcName = "SetScript";
-                    else funcName = "Annotation";
-
-                    builder.AppendNewLine(".")
-                        .Append(funcName)
-                        .Append("(@\"")
-                        .Append(EscapeString(item.Value))
-                        .Append(")");
-
-                }
+                GenerateSetScript(operation, builder);
                 builder.Append(";");
+            }
+        }
+
+        protected void GenerateSetScript(MigrationOperation operation, IndentedStringBuilder builder)
+        {
+            foreach (var item in operation.Annotations)
+            {
+                var keyParts = item.Key.Split(':');
+                ProviderName provider = ProviderName.All;
+                if (keyParts.Length == 2)
+                    Enum.TryParse(keyParts[0], true, out provider);
+                string funcName;
+                if (string.Equals(keyParts.Last(), "sql", StringComparison.OrdinalIgnoreCase))
+                    funcName = "SetScript";
+                else funcName = "Annotation";
+
+                builder.AppendNewLine(".")
+                    .Append(funcName)
+                    .Append("(@\"")
+                    .Append(EscapeString(item.Value))
+                    .Append(")");
             }
         }
 
@@ -452,6 +458,34 @@ namespace Genus.Migrator.Migrations.Design.Internal
                 }
             }
             builder.Append(";");
+        }
+
+        protected virtual void Generate(CreateTrigger operation, IndentedStringBuilder builder)
+        {
+            builder.AppendNewLine("migrationBuilder.AddTrigger(");
+            using (builder.Indenter())
+            {
+                if (!string.IsNullOrWhiteSpace(operation.TriggerSchema))
+                    builder.AppendNewLine($"triggerSchema: @\"{operation.TriggerSchema}\",");
+                builder.AppendNewLine($"triggerName: @\"{operation.TriggerName}\",");
+                if (!string.IsNullOrWhiteSpace(operation.Schema))
+                    builder.AppendNewLine($"tableSchema: @\"{operation.Schema}\",");
+                builder.AppendNewLine($"tableName: @\"{operation.TableName}\",")
+                    .AppendNewLine($"triggerType: TriggerType.{operation.TriggerType},")
+                    .AppendNewLine($"triggerOperations: {operation.TriggerOperation}")
+                    .Append(")");
+                GenerateSetScript(operation, builder);
+                builder.Append(";");
+            }
+        }
+
+        protected virtual void Generate(DropTrigger operation, IndentedStringBuilder builder)
+        {
+            builder.AppendNewLine("migrationBuilder.DropTrigger(")
+                .Append($"@\"{operation.TriggerName}\"");
+            if (!string.IsNullOrWhiteSpace(operation.TriggerSchema))
+                builder.Append($", @\"{operation.TriggerSchema}\", ");
+            builder.Append(");");
         }
 
         public void Generate(IEnumerable<MigrationOperation> operations, IndentedStringBuilder builder)

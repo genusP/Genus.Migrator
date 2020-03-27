@@ -3,7 +3,7 @@
 namespace Genus.Migrator.Model
 {
     [Flags]
-    public enum TriggerOpertaion
+    public enum TriggerOperation
     {
         INSERT=1,
         UPDATE=2,

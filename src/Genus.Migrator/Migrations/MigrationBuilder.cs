@@ -441,5 +441,68 @@ namespace Genus.Migrator.Migrations
             _operations.Value.Add(operation);
             return new OperationBuilder<RenameFunction>(operation);
         }
+
+        public CreateTriggerBuilder AddTrigger(
+            string tableName, 
+            string triggerName, 
+            string tableSchema=null, 
+            string triggerSchema=null, 
+            TriggerType triggerType=TriggerType.AFTER,
+            TriggerOperation triggerOperations=TriggerOperation.ALL)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new ArgumentException("Need value", nameof(tableName));
+            if (string.IsNullOrWhiteSpace(triggerName))
+                throw new ArgumentException("Need value", nameof(triggerName));
+            var operation = new CreateTrigger
+            {
+                Schema = tableSchema,
+                TableName = tableName,
+                TriggerSchema = triggerSchema,
+                TriggerName = triggerName,
+                TriggerOperation = triggerOperations,
+                TriggerType = triggerType
+            };
+            _operations.Value.Add(operation);
+            return new CreateTriggerBuilder(operation);
+        }
+
+        public CreateTriggerBuilder AlterTrigger(
+            string tableName,
+            string triggerName,
+            string tableSchema = null,
+            string triggerSchema = null,
+            TriggerType triggerType = TriggerType.AFTER,
+            TriggerOperation triggerOperations = TriggerOperation.ALL)
+        {
+            if (string.IsNullOrWhiteSpace(tableName))
+                throw new ArgumentException("Need value", nameof(tableName));
+            if (string.IsNullOrWhiteSpace(triggerName))
+                throw new ArgumentException("Need value", nameof(triggerName));
+            var operation = new AlterTrigger
+            {
+                Schema = tableSchema,
+                TableName = tableName,
+                TriggerSchema = triggerSchema,
+                TriggerName = triggerName,
+                TriggerOperation = triggerOperations,
+                TriggerType = triggerType
+            };
+            _operations.Value.Add(operation);
+            return new CreateTriggerBuilder(operation);
+        }
+
+        public OperationBuilder<DropTrigger> DropTrigger( string triggerName, string triggerSchema=null)
+        {
+            if (string.IsNullOrWhiteSpace(triggerName))
+                throw new ArgumentNullException(nameof(triggerName));
+            var operation = new DropTrigger
+            {
+                TriggerSchema = triggerSchema,
+                TriggerName = triggerName
+            };
+            _operations.Value.Add(operation);
+            return new OperationBuilder<DropTrigger>(operation);
+        }
     }
 }

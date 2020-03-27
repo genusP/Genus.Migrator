@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-alpha2-1500",
+  "version": "1.0.0-alpha2-1602",
   "description": "Genus.Migrator CLI",
   "authors": [ "genusP" ],
   "packOptions": {
@@ -8,6 +8,7 @@
     "licenseUrl": ""
   },
   "frameworks": {
+    "net451": { },
     "netstandard1.3": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1",
